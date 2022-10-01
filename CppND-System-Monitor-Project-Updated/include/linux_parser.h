@@ -5,6 +5,14 @@
 #include <regex>
 #include <string>
 
+#define USER_TIME_INDEX       13
+#define KERNEL_TIME_INDEX     14
+#define C_USER_TIME_INDEX     15
+#define C_KERNEL_TIME_INDEX   16
+#define TIMEVALUES_MAX_INDEX  21
+#define KB_DIVIDER            1024
+#define UPTIME_INDEX          22
+
 namespace LinuxParser {
 // Paths
 const std::string kProcDirectory{"/proc/"};

@@ -1,29 +1,25 @@
 #include "processor.h"
 #include "linux_parser.h"
 
-using namespace std::chrono;
 
-// Return the aggregate CPU utilization
 float Processor::Utilization() {
-  if (counter == 0) {
-    time_ms = steady_clock::now();
-    counter++;
-  }
+ 
+  long TotalTime, PrevTotalTime, TotalTimeDiff, IdleDiff;
+  float CPU_Utilization;
   
-  long active_time = LinuxParser::ActiveJiffies();
-  long idle_time = LinuxParser::IdleJiffies();
-  long a_time = active_time - cached_active_time;
-  long i_time = idle_time - cached_idle_time;
-  long total_time = a_time + i_time;
-  auto time_diff = duration_cast<std::chrono::milliseconds>(steady_clock::now() - time_ms);
+  ActiveTime = LinuxParser::ActiveJiffies();
+  IdleTime = LinuxParser::IdleJiffies();
+
+  PrevTotalTime = PrevActiveTime + PrevIdleTime;
+  TotalTime = ActiveTime + IdleTime;
+
+  TotalTimeDiff = TotalTime - PrevTotalTime;
+  IdleDiff = IdleTime - PrevIdleTime;
+
+  CPU_Utilization = (float)(TotalTimeDiff - IdleDiff)/TotalTimeDiff;
   
-  if (time_diff.count() > 100U) {
-    cpu_utilization = (float) a_time / (float) total_time;
-    cached_active_time = active_time;
-    cached_idle_time = idle_time;
-    time_ms = steady_clock::now();
-    return cpu_utilization;
-  }
+  PrevIdleTime = IdleTime;
+  PrevActiveTime = ActiveTime;
   
-  return cpu_utilization;
+  return CPU_Utilization;
 }
